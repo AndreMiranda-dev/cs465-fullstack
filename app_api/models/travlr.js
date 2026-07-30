@@ -8,7 +8,9 @@ const tripSchema = new mongoose.Schema({
   resort: { type: String, required: true },
   perPerson: { type: Number, required: true },
   category: { type: String, required: true },
-  slug: { type: String, required: true, unique: true }
+  slug: { type: String, required: true, unique: true },
+  image: { type: String, required: true },
+  description: { type: String, required: true }
 });
 
 mongoose.model('Trip', tripSchema);

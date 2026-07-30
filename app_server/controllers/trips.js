@@ -1,30 +1,96 @@
 const mongoose = require('mongoose');
 const Trip = mongoose.model('Trip');
 
-// GET /trips – return all trips
-const tripsList = async (req, res) => {
-  try {
-    const trips = await Trip.find({});
-    res.status(200).json(trips);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+// Logging helper
+const logError = (location, err) => {
+    console.error(`[${new Date().toISOString()}] ERROR in ${location}: ${err.message}`);
 };
 
-// GET /trips/:tripCode – return one trip by code
-const tripsFindByCode = async (req, res) => {
-  try {
-    const trip = await Trip.findOne({ code: req.params.tripCode });
-    if (!trip) {
-      return res.status(404).json({ message: 'Trip not found' });
+// Helper to send JSON responses
+const sendJSONResponse = (res, status, content) => {
+    res.status(status).json(content);
+};
+
+// GET /api/trips – return all trips
+const tripsList = async (req, res) => {
+    try {
+        const trips = await Trip.find({});
+        return sendJSONResponse(res, 200, trips);
+    } catch (err) {
+        logError('tripsList', err);
+        return sendJSONResponse(res, 500, {
+            status: 500,
+            message: 'Error retrieving trips'
+        });
     }
-    res.status(200).json(trip);
-  } catch (err) {
-    res.status(500).json(err);
-  }
+};
+
+// GET /api/trips/:tripCode – return one trip by code
+const tripsFindByCode = async (req, res) => {
+    const tripCode = req.params.tripCode;
+
+    if (!tripCode || typeof tripCode !== 'string') {
+        return sendJSONResponse(res, 400, {
+            status: 400,
+            message: 'Invalid trip code format'
+        });
+    }
+
+    try {
+        const trip = await Trip.findOne({ code: tripCode });
+
+        if (!trip) {
+            return sendJSONResponse(res, 404, {
+                status: 404,
+                message: 'Trip not found'
+            });
+        }
+
+        return sendJSONResponse(res, 200, trip);
+
+    } catch (err) {
+        logError('tripsFindByCode', err);
+        return sendJSONResponse(res, 500, {
+            status: 500,
+            message: 'Error retrieving trip'
+        });
+    }
+};
+
+// GET /api/trips/details/:slug – return one trip by slug
+const tripsFindBySlug = async (req, res) => {
+    const slug = req.params.slug;
+
+    if (!slug || typeof slug !== 'string') {
+        return sendJSONResponse(res, 400, {
+            status: 400,
+            message: 'Invalid slug format'
+        });
+    }
+
+    try {
+        const trip = await Trip.findOne({ slug });
+
+        if (!trip) {
+            return sendJSONResponse(res, 404, {
+                status: 404,
+                message: 'Trip not found'
+            });
+        }
+
+        return sendJSONResponse(res, 200, trip);
+
+    } catch (err) {
+        logError('tripsFindBySlug', err);
+        return sendJSONResponse(res, 500, {
+            status: 500,
+            message: 'Database error occurred'
+        });
+    }
 };
 
 module.exports = {
-  tripsList,
-  tripsFindByCode
+    tripsList,
+    tripsFindByCode,
+    tripsFindBySlug
 };
