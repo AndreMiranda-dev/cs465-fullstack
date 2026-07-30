@@ -1,16 +1,15 @@
-var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-require('./app_server/models/db');
-
+require('./app_api/models/db');
 
 // Routers
 var indexRouter = require('./app_server/routes/index');
 var usersRouter = require('./app_server/routes/users');
 var travelRouter = require('./app_server/routes/travel');
+var apiRouter = require('./app_api/routes/index');
 
 // Handlebars
 var handlebars = require('hbs');
@@ -40,21 +39,26 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/travel', travelRouter);
+app.use('/api', apiRouter);
 
-// ===== ERROR HANDLING =====
+// ===== GLOBAL ERROR HANDLING =====
 
-// Catch 404
-app.use(function(req, res, next) {
-  next(createError(404));
+// 404 Handler (No route matched)
+app.use((req, res) => {
+    res.status(404).render('error', {
+        title: 'Page Not Found',
+        message: 'The page you are looking for does not exist.'
+    });
 });
 
-// Error handler
-app.use(function(err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+// 500 Handler (Unhandled server errors)
+app.use((err, req, res, next) => {
+    console.error(`[${new Date().toISOString()}] SERVER ERROR:`, err.message);
 
-  res.status(err.status || 500);
-  res.render('error');
+    res.status(500).render('error', {
+        title: 'Server Error',
+        message: 'Something went wrong on the server.'
+    });
 });
 
 module.exports = app;

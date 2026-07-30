@@ -20,4 +20,7 @@ router.get('/trips/:tripCode', tripsController.tripsFindByCode);
 // Dynamic pages
 router.get('/travel', ctrlTravel.travel);
 
+// GET Travel Details page (public website)
+router.get('/travel/:slug', ctrlTravel.travelDetails);
+
 module.exports = router;
