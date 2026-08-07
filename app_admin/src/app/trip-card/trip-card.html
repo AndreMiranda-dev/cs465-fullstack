@@ -1,0 +1,30 @@
+<!-- Trip card container -->
+<div class="card" style="width: 16rem;">
+  <div class="card-header">{{ trip.name }}</div>
+
+  <!-- Trip image -->
+  <img src="assets/images/{{ trip.image }}"
+       alt="trip thumbnail"
+       class="card-img-top">
+
+  <div class="card-body">
+
+    <!-- Resort name -->
+    <h6 class="card-subtitle mb-2 text-muted">
+      {{ trip.resort }}
+    </h6>
+
+    <!-- Length and price -->
+    <p class="card-subtitle mt-3 mb-3 text-muted">
+      {{ trip.length }} only {{ trip.perPerson | currency:'USD':'symbol' }} per person
+    </p>
+
+    <!-- Trip description -->
+    <p class="card-text" [innerHTML]="trip.description"></p>
+
+    <!-- Edit Trip button -->
+    <button class="btn btn-warning mt-3" (click)="editTrip(trip)">
+      Edit Trip
+    </button>
+  </div>
+</div>

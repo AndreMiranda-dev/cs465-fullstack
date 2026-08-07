@@ -1,13 +1,16 @@
+// Implements all Trip API controller actions including listing, retrieving,
+// creating, and updating trips in the MongoDB database.
+
 const mongoose = require('mongoose');
 const Trip = mongoose.model('Trip');
 
-// Helper to send JSON responses
+// Sends a JSON response with the given status and payload.
 const sendJSONResponse = (res, status, content) => {
   res.status(status);
   res.json(content);
 };
 
-// GET /api/trips  → return all trips
+// Returns all trips from the database.
 module.exports.tripsList = async (req, res) => {
   try {
     const trips = await Trip.find().exec();
@@ -17,7 +20,7 @@ module.exports.tripsList = async (req, res) => {
   }
 };
 
-// GET /api/trips/:code  → return one trip by code
+// Returns a single trip using its unique trip code.
 module.exports.tripsFindByCode = async (req, res) => {
   try {
     const tripCode = req.params.code;
@@ -33,11 +36,11 @@ module.exports.tripsFindByCode = async (req, res) => {
   }
 };
 
-// GET /api/trips/details/:slug → return one trip by slug (validated)
+// Returns a single trip using its slug, with validation for proper format.
 module.exports.tripsFindBySlug = async (req, res) => {
   const slug = req.params.slug;
 
-  // Validate slug
+  // Validates slug format before querying.
   if (!slug || typeof slug !== 'string') {
     return sendJSONResponse(res, 400, {
       status: 400,
@@ -63,6 +66,65 @@ module.exports.tripsFindBySlug = async (req, res) => {
     return sendJSONResponse(res, 500, {
       status: 500,
       message: 'Database error occurred.'
+    });
+  }
+};
+
+// Creates a new trip using data provided in the request body.
+module.exports.tripsAddTrip = async (req, res) => {
+  try {
+    const trip = await Trip.create({
+      code: req.body.code,
+      name: req.body.name,
+      length: req.body.length,
+      start: new Date(req.body.start),
+      resort: req.body.resort,
+      perPerson: Number(req.body.perPerson),
+      image: req.body.image,
+      description: req.body.description
+    });
+
+    sendJSONResponse(res, 201, trip);
+  } catch (err) {
+    console.error("Trip creation error:", err);
+    sendJSONResponse(res, 400, {
+      message: 'Error creating trip',
+      error: err
+    });
+  }
+};
+
+// Updates an existing trip using its trip code.
+module.exports.tripsUpdateTrip = async (req, res) => {
+  try {
+    const tripCode = req.params.tripCode;
+
+    const updatedTrip = await Trip.findOneAndUpdate(
+      { code: tripCode },
+      {
+        code: req.body.code,
+        name: req.body.name,
+        length: req.body.length,
+        start: new Date(req.body.start),
+        resort: req.body.resort,
+        perPerson: Number(req.body.perPerson),
+        image: req.body.image,
+        description: req.body.description
+      },
+      { new: true }
+    ).exec();
+
+    if (!updatedTrip) {
+      return sendJSONResponse(res, 404, { message: 'Trip not found' });
+    }
+
+    return sendJSONResponse(res, 200, updatedTrip);
+
+  } catch (err) {
+    console.error("Trip update error:", err);
+    return sendJSONResponse(res, 400, {
+      message: 'Error updating trip',
+      error: err
     });
   }
 };

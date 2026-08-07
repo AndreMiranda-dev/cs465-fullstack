@@ -1,0 +1,16 @@
+<!-- Add Trip button -->
+<div class="row mb-3">
+  <div class="col-12 text-end">
+    <button class="btn btn-primary" (click)="addTrip()">Add Trip</button>
+  </div>
+</div>
+
+<!-- Trip cards -->
+<div class="row">
+  <div class="col-md-4 col-sm-12" *ngFor="let trip of trips">
+    <app-trip-card [trip]="trip"></app-trip-card>
+  </div>
+</div>
+
+<!-- Status message -->
+<p>{{ message }}</p>
