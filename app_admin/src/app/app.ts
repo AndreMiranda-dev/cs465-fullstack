@@ -3,16 +3,16 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { Navbar } from './navbar/navbar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, Navbar],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
 export class App {
 
-  // Reactive title signal used in the root template.
   protected readonly title = signal('Travlr Getaways Admin!');
 }

@@ -1,0 +1,9 @@
+<nav class="navbar">
+  <button routerLink="/" class="mac-btn">Home</button>
+
+  <!-- Show Login when logged out -->
+  <button routerLink="/login" class="mac-btn" *ngIf="!(auth.isLoggedIn$() | async)">Login</button>
+
+  <!-- Show Logout when logged in -->
+  <button (click)="logout()" class="mac-btn" *ngIf="auth.isLoggedIn$() | async">Logout</button>
+</nav>

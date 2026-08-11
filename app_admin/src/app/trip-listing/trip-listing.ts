@@ -1,5 +1,3 @@
-// Lists all trips and handles navigation to Add Trip.
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -7,6 +5,7 @@ import { Router } from '@angular/router';
 import { Trip } from '../models/trip';
 import { TripDataService } from '../services/trip-data';
 import { TripCard } from '../trip-card/trip-card';
+import { Authentication } from '../services/authentication';
 
 @Component({
   selector: 'app-trip-listing',
@@ -18,14 +17,15 @@ import { TripCard } from '../trip-card/trip-card';
 export class TripListing implements OnInit {
 
   // Holds all trips returned from the API.
-  trips: Trip[] = [];
+  public trips: Trip[] = [];
 
   // Message displayed above the trip list.
-  message: string = '';
+  public message: string = '';
 
   constructor(
     private tripDataService: TripDataService,
-    private router: Router
+    private router: Router,
+    public auth: Authentication   // <-- inject the correct class and make it public for template access
   ) {
     console.log('TripListing constructed');
   }
@@ -41,7 +41,10 @@ export class TripListing implements OnInit {
           ? `There are ${trips.length} trips available.`
           : 'There were no trips retrieved from the database.';
       },
-      error: (err: any) => console.error('Trip load error:', err)
+      error: (err: any) => {
+        console.error('Trip load error:', err);
+        this.message = 'Error loading trips';
+      }
     });
   }
 
