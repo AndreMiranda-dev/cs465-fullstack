@@ -23,12 +23,18 @@ mongoose.connection.on('disconnected', () => {
 });
 
 // Ensures clean shutdown of the database connection on app termination.
-process.on('SIGINT', () => {
-  mongoose.connection.close(() => {
+// Mongoose v7+ no longer accepts a callback in connection.close()
+process.on('SIGINT', async () => {
+  try {
+    await mongoose.connection.close();
     console.log('Mongoose disconnected through app termination');
     process.exit(0);
-  });
+  } catch (err) {
+    console.log('Error during Mongoose shutdown:', err);
+    process.exit(1);
+  }
 });
 
 // Loads all Mongoose models used by the application.
 require('./travlr');
+require('./user');

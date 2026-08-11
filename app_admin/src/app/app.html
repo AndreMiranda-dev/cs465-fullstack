@@ -1,11 +1,7 @@
-<!-- Navigation bar -->
-<nav class="navbar navbar-expand-lg bg-light">
-  <div class="container">
-    <a class="navbar-brand" href="#">{{ title() }}</a>
-  </div>
-</nav>
+<app-navbar></app-navbar>
 
-<!-- Routed views -->
 <div class="container mt-4">
+  <h1>{{ title() }}</h1>
+
   <router-outlet></router-outlet>
 </div>

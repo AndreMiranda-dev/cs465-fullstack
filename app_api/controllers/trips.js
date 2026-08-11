@@ -10,6 +10,20 @@ const sendJSONResponse = (res, status, content) => {
   res.json(content);
 };
 
+// Safe date parser
+const safeParseDate = (value) => {
+  if (!value) return undefined;
+  const parsed = Date.parse(value);
+  return isNaN(parsed) ? undefined : new Date(parsed);
+};
+
+// Safe number parser
+const safeParseNumber = (value) => {
+  if (value === null || value === undefined) return undefined;
+  const parsed = Number(value);
+  return isNaN(parsed) ? undefined : parsed;
+};
+
 // Returns all trips from the database.
 module.exports.tripsList = async (req, res) => {
   try {
@@ -40,7 +54,6 @@ module.exports.tripsFindByCode = async (req, res) => {
 module.exports.tripsFindBySlug = async (req, res) => {
   const slug = req.params.slug;
 
-  // Validates slug format before querying.
   if (!slug || typeof slug !== 'string') {
     return sendJSONResponse(res, 400, {
       status: 400,
@@ -77,9 +90,9 @@ module.exports.tripsAddTrip = async (req, res) => {
       code: req.body.code,
       name: req.body.name,
       length: req.body.length,
-      start: new Date(req.body.start),
+      start: safeParseDate(req.body.start),
       resort: req.body.resort,
-      perPerson: Number(req.body.perPerson),
+      perPerson: safeParseNumber(req.body.perPerson),
       image: req.body.image,
       description: req.body.description
     });
@@ -105,13 +118,13 @@ module.exports.tripsUpdateTrip = async (req, res) => {
         code: req.body.code,
         name: req.body.name,
         length: req.body.length,
-        start: new Date(req.body.start),
+        start: safeParseDate(req.body.start),
         resort: req.body.resort,
-        perPerson: Number(req.body.perPerson),
+        perPerson: safeParseNumber(req.body.perPerson),
         image: req.body.image,
         description: req.body.description
       },
-      { new: true }
+      { new: true, runValidators: false }
     ).exec();
 
     if (!updatedTrip) {

@@ -4,6 +4,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Trip } from '../models/trip';
 import { Router } from '@angular/router';
+import { Authentication } from '../services/authentication';
 
 @Component({
   selector: 'app-trip-card',
@@ -14,12 +15,17 @@ import { Router } from '@angular/router';
 })
 export class TripCard {
 
-  // Trip data passed in from the listing component.
   @Input() trip!: Trip;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private auth: Authentication
+  ) {}
 
-  // Stores the trip code and navigates to the edit page.
+  public isLoggedIn(): boolean {
+    return this.auth.isLoggedIn();
+  }
+
   editTrip(trip: Trip): void {
     localStorage.setItem('tripCode', trip.code);
     this.router.navigate(['edit-trip']);
